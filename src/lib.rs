@@ -1,13 +1,13 @@
 use blueprint_sdk::event_listeners;
 use blueprint_sdk::event_listeners::cronjob::CronJobDefinition;
-use blueprint_sdk::macros::contexts::EigenlayerContext;
+use blueprint_sdk::macros::contexts::{ServicesContext, TangleClientContext};
 use blueprint_sdk::{config::GadgetConfiguration, event_listeners::cronjob::CronJob};
 use serenity::all::{ChannelId, Http};
 use std::convert::Infallible;
 
 pub mod llm;
 
-#[derive(Clone, EigenlayerContext)]
+#[derive(Clone, TangleClientContext)]
 pub struct ServiceContext {
     #[config]
     pub config: GadgetConfiguration,

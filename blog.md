@@ -227,23 +227,90 @@ async fn main() {
 
 ## Database Setup
 
-Before we can run our service, we need to set up the database. Create a new file called `schema.sql`:
+Our service needs a PostgreSQL database to store messages and summaries. Let's set up the database components:
 
-```sql
--- Create messages table for storing Discord messages
-CREATE TABLE IF NOT EXISTS messages (
-    id SERIAL PRIMARY KEY,
-    data JSONB NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
+First, create `src/db.rs` to handle database connections and table creation:
 
--- Create summaries table for storing daily summaries
-CREATE TABLE IF NOT EXISTS summaries (
-    id SERIAL PRIMARY KEY,
-    summary VARCHAR NOT NULL,
-    date DATE NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
+```rust
+use sqlx::postgres::{PgPool, PgPoolOptions};
+use std::time::Duration;
+
+pub async fn setup_database() -> Result<PgPool, Box<dyn std::error::Error>> {
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+
+    // Configure and create connection pool
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .acquire_timeout(Duration::from_secs(3))
+        .connect(&database_url)
+        .await?;
+
+    // Create tables if they don't exist
+    create_tables(&pool).await?;
+
+    Ok(pool)
+}
+
+async fn create_tables(pool: &PgPool) -> Result<(), Box<dyn std::error::Error>> {
+    // Create messages table
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS messages (
+            id SERIAL PRIMARY KEY,
+            data JSONB NOT NULL,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+        );"#,
+    )
+    .execute(pool)
+    .await?;
+
+    // Create summaries table
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS summaries (
+            id SERIAL PRIMARY KEY,
+            summary VARCHAR NOT NULL,
+            date DATE NOT NULL,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+        );"#,
+    )
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
+```
+
+Next, create a helper script `scripts/setup_db.sh` to initialize the database:
+
+```bash
+#!/bin/bash
+
+# Load environment variables
+set -a
+source .env
+set +a
+
+# Check if psql is installed
+if ! command -v psql &> /dev/null; then
+    echo "Error: PostgreSQL client (psql) is not installed"
+    exit 1
+fi
+
+# Extract database name from DATABASE_URL
+DB_NAME=$(echo $DATABASE_URL | sed 's/.*\///g')
+
+# Create database if it doesn't exist
+psql -h localhost -U postgres -c "CREATE DATABASE $DB_NAME;" 2>/dev/null || true
+
+echo "Database setup complete!"
+```
+
+Make the script executable and run it:
+
+```bash
+chmod +x scripts/setup_db.sh
+./scripts/setup_db.sh
 ```
 
 Create a `.env` file with your configuration:
@@ -253,20 +320,26 @@ DATABASE_URL=postgres://username:password@localhost:5432/discord_summaries
 DISCORD_TOKEN=your_discord_bot_token
 CHANNEL_ID=your_discord_channel_id
 HYPERBOLIC_API_KEY=your_hyperbolic_api_key
+CRON_SCHEDULE="0 0 * * *"  # Optional: defaults to midnight if not set
 ```
 
 ## Testing Locally
 
-1. Start your PostgreSQL database and apply the schema:
+1. Make sure PostgreSQL is running and set up the database:
 
 ```bash
-psql -U username -d discord_summaries -f schema.sql
+./scripts/setup_db.sh
 ```
 
-2. Build and run the service:
+1. Build the blueprint:
 
 ```bash
 cargo build
+```
+
+2. Run the service:
+
+```bash
 cargo run
 ```
 
