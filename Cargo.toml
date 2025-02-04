@@ -1,0 +1,47 @@
+[package]
+name = "discord-summarizer-rig-blueprint"
+version = "0.1.0"
+edition = "2021"
+description = "tangle-network"
+authors = ["Drew Stone <drewstone329@gmail.com>"]
+license = "MIT OR Apache-2.0"
+homepage = "https://tangle.tools"
+repository = "https://github.com/tangle-network/discord-summarizer-rig-blueprint"
+readme = "README.md"
+categories = ["cryptography", "cryptography::cryptocurrencies"]
+keywords = ["tangle", "blueprint", "avs"]
+rust-version = "1.81"
+
+[dependencies]
+blueprint-sdk = { git = "https://github.com/tangle-network/gadget", features = ["cronjob", "eigenlayer", "evm", "macros"] }
+chrono = { version = "0.4.39", features = ["serde"] }
+dotenv = "0.15.0"
+rig-core = "0.7.0"
+serenity = "0.12.4"
+sqlx = { version = "0.8.3", features = ["runtime-tokio-rustls", "postgres", "chrono", "macros"] }
+
+[build-dependencies]
+blueprint-sdk = { git = "https://github.com/tangle-network/gadget", features = ["build"] }
+
+[dev-dependencies]
+blueprint-sdk = { git = "https://github.com/tangle-network/gadget", features = ["testing", "eigenlayer"] }
+color-eyre = "0.6.3"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "discord-summarizer-rig-blueprint"
+path = "src/main.rs"
+
+[package.metadata.blueprint]
+manager = { Evm = "HelloBlueprint" }
+
+[[package.metadata.gadget.Native.sources]]
+owner = "tangle-network"
+repo = "discord-summarizer-rig-blueprint"
+tag = "0.1.0"
+binaries = [
+    { arch = "Amd64", os = "Linux", name = "amd64-linux-discord-summarizer-rig-blueprint-gadget" },
+    { arch = "Arm64", os = "Linux", name = "arm64-linux-discord-summarizer-rig-blueprint-gadget" },
+]
