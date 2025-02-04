@@ -1,22 +1,28 @@
-# <h1 align="center">Hello World Tangle Blueprint 🌐</h1>
+# <h1 align="center">Discord Channel Summarizer Blueprint 🤖</h1>
 
 ## 📚 Overview
 
-This Tangle Blueprint provides a simple Hello World job.
+This Tangle Blueprint provides an automated Discord channel summarization service using Hyperbolic's AI cloud.
+
 Blueprints are specifications for <abbr title="Actively Validated Services">AVS</abbr>s on the Tangle Network. An AVS is
 an off-chain service that runs arbitrary computations for a user-specified period of time.
 
-Blueprints provide a useful abstraction, allowing developers to create reusable service infrastructures as if they were
-smart contracts. This enables developers to monetize their work and align long-term incentives with the success of their
-creations, benefiting proportionally to their Blueprint's usage.
+This blueprint demonstrates how to create an automated AI-powered service that:
+
+- Listens to Discord channels
+- Aggregates messages over 24-hour periods
+- Generates AI summaries using Hyperbolic through Rig's client adapter
+- Posts results on-chain for verification and provenance
 
 For more details, please refer to the [project documentation](https://docs.tangle.tools/developers/blueprints/introduction).
 
 ## 🚀 Features
 
-- Custom greeting messages
-- Default "Hello World!" messages
-- ...
+- 🤖 Automated 24-hour channel summarization
+- 🔗 On-chain result verification
+- 🧠 AI-powered content summarization via Hyperbolic
+- ⚡ Easy operator registration and management
+- 📊 Transparent job execution tracking
 
 ## 📋 Prerequisites
 
@@ -24,6 +30,9 @@ Before you can run this project, you will need to have the following software in
 
 - [Rust](https://www.rust-lang.org/tools/install)
 - [Forge](https://getfoundry.sh)
+- Discord Bot Token
+- Hyperbolic API credentials
+- Access to Tangle Network (testnet)
 
 You will also need to install [cargo-tangle](https://crates.io/crates/cargo-tangle), our CLI tool for creating and
 deploying Tangle Blueprints:
@@ -44,37 +53,56 @@ cargo install cargo-tangle --force # to get the latest version.
 
 ## ⭐ Getting Started
 
-Once `cargo-tangle` is installed, you can create a new project with the following command:
-
-```sh
-cargo tangle blueprint create --name <project-name>
-```
-
-and follow the instructions to create a new project.
-
-## 🛠️ Development
-
-Once you have created a new project, you can run the following command to start the project:
+1. Clone the repository and install dependencies:
 
 ```sh
 cargo build
 ```
 
-to build the project, and
+2. Configure environment variables:
+
+```sh
+cp .env.example .env
+# Edit .env with your credentials:
+# - DISCORD_TOKEN
+# - HYPERBOLIC_API_KEY
+# - TANGLE_WS_URL
+```
+
+3. Deploy the blueprint to Tangle:
 
 ```sh
 cargo tangle blueprint deploy
 ```
 
-to deploy the blueprint to the Tangle network.
+## 🛠️ Development
+
+The blueprint consists of three main components:
+
+1. **Smart Contract** (`HelloBlueprint.sol`):
+
+   - Handles operator registration
+   - Processes job requests
+   - Verifies and stores summarization results
+
+2. **Service Implementation** (`lib.rs`):
+
+   - Defines the summarization job
+   - Implements Discord message collection
+   - Manages AI summarization calls
+
+3. **Runner** (`main.rs`):
+   - Sets up the service context
+   - Initializes event listeners
+   - Manages the service lifecycle
 
 ## 📜 License
 
 Licensed under either of
 
-* Apache License, Version 2.0
+- Apache License, Version 2.0
   ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-* MIT license
+- MIT license
   ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 
 at your option.
