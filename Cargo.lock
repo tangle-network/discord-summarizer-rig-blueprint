@@ -8114,7 +8114,7 @@ dependencies = [
  "portable-atomic",
  "portable-atomic-util",
  "serde",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -13691,10 +13691,12 @@ dependencies = [
 
 [[package]]
 name = "rig-core"
-version = "0.7.0"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f8190b6b290cc0b9bd7ff44156e288f0df82c2d3cbccc9ffa1c44493b38ffc4"
+checksum = "43348451da1864f173a4f615ab9ddda1f6017d6493564ac70db950f0b2a103dd"
 dependencies = [
+ "async-stream",
+ "bytes",
  "futures",
  "glob",
  "ordered-float 4.6.0",
